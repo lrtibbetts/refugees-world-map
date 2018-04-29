@@ -1,15 +1,36 @@
-// resource utilized: https://forum.processing.org/one/topic/interactive-svg-map-with-processing-js.html
+/* Data Visualization Final Project
+   Lucy Tibbetts
+   resources utilized: https://forum.processing.org/one/topic/interactive-svg-map-with-processing-js.html
+                       http://www.sojamo.de/libraries/controlP5/examples/controllers/ControlP5textfield/ControlP5textfield.pde
+*/
 
 import java.util.*;
+import controlP5.*; // library for simple gui elements
+import org.gicentre.utils.stat.*; // library for creating graphs, etc.
 
 PShape worldMap;
 Table refugeesData;
 Table countries; // table containing country codes
 HashMap totals;
 int maxTotal;
+ControlP5 cp5; 
+PFont calibri;
+String text;
 
 void setup() {
   size(1800, 950);
+  
+  // text box input
+  cp5 = new ControlP5(this);
+  calibri = loadFont("Calibri-28.vlw");
+  
+  cp5.addTextfield("Country")
+     .setPosition(1475,75)
+     .setSize(250,40)
+     .setFont(calibri) 
+     .setColor(255)
+     ;
+  
   worldMap = loadShape("worldHigh.svg");
   worldMap.scale(1.4);
   // svg map from: https://www.amcharts.com/svg-maps/?map=world
@@ -47,7 +68,7 @@ void setup() {
   noStroke();
   worldMap.disableStyle();
   
-  // draw the full map first to account for any countries without refugee data
+  // draw the full map first to account for any countries without data
   fill(#fee0d2);
   shape(worldMap, 20, 20);
   
@@ -58,8 +79,6 @@ void setup() {
     String country = entry.getKey();
     int total = (int) entry.getValue();
     PShape countryShape = worldMap.getChild(country);
-    //float amt = norm(total, 0, maxTotal); // get normalized calue for number of refugees
-    //color c = lerpColor(#9ecae1, #08306b, amt); // used color brewer
     color c;
     if (total <= 1000) {
       c = #fcbba1;
@@ -79,11 +98,20 @@ void setup() {
   }
 }
 
-void draw() {
- 
+void controlEvent(ControlEvent event) {
+  if(event.isAssignableFrom(Textfield.class)) {
+    String country = event.getStringValue();
+    HashMap<String, Integer> originCountries = new HashMap<String, Integer>();
+    for (TableRow row : refugeesData.findRows(country, "Country or territory of asylum or residence")) {
+      String originCountry = row.getString("Country or territory of origin");
+      int numRefugees = row.getInt("Refugees");
+      originCountries.put(originCountry, numRefugees);
+      System.out.println(originCountry + ": " + numRefugees);
+    }
+           
+  }
 }
 
-void mouseMoved() {
-  System.out.println(mouseX);
-  
+void draw() {
+ 
 }
