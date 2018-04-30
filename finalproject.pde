@@ -15,28 +15,30 @@ HashMap totals;
 int maxTotal;
 ControlP5 cp5; 
 PFont calibri;
+PFont smallcalibri;
 String text;
+BarChart chart;
 
 void setup() {
-  size(1800, 950);
+  size(1900, 950);
+  
+  // fonts
+  calibri = loadFont("Calibri-28.vlw");
+  smallcalibri = loadFont("Calibri-Bold-20.vlw");
   
   // text box input
   cp5 = new ControlP5(this);
-  calibri = loadFont("Calibri-28.vlw");
-  
   cp5.addTextfield("Country")
-     .setPosition(1475,75)
+     .setPosition(1600,50)
      .setSize(250,40)
      .setFont(calibri) 
      .setColor(255)
      ;
   
-  worldMap = loadShape("worldHigh.svg");
-  worldMap.scale(1.4);
-  // svg map from: https://www.amcharts.com/svg-maps/?map=world
-  refugeesData = loadTable("refugees2016.csv", "header");
+  worldMap = loadShape("worldHigh.svg"); // svg map from: https://www.amcharts.com/svg-maps/?map=world
+  worldMap.scale(1.25);
+  refugeesData = loadTable("refugees2016.csv", "header"); // data from: http://data.un.org/Data.aspx?d=UNHCR&f=indID%3AType-Ref
   countries = loadTable("countries.csv", "header");
-  // data from: http://data.un.org/Data.aspx?d=UNHCR&f=indID%3AType-Ref
 
   totals = new HashMap<String, Integer>();
   int numRows = refugeesData.getRowCount();
@@ -93,22 +95,47 @@ void setup() {
     } else
       c = #99000d;
     fill(c);
-    countryShape.scale(1.4);
+    countryShape.scale(1.25);
     shape(countryShape, 20, 20);
   }
 }
 
 void controlEvent(ControlEvent event) {
+  fill(#A7ABAD);
+  rect(1290, 400, 610, 500); // clear area to draw new graph
+  
   if(event.isAssignableFrom(Textfield.class)) {
     String country = event.getStringValue();
-    HashMap<String, Integer> originCountries = new HashMap<String, Integer>();
+    String[] originCountries = {"N/A", "N/A", "N/A", "N/A", "N/A"}; // initalize array with N/A
+    float[] numRefugees = {0, 0, 0, 0, 0}; // initalize array with 0
+    TreeMap<Float, String> allVals = new TreeMap<Float, String>();
+    
     for (TableRow row : refugeesData.findRows(country, "Country or territory of asylum or residence")) {
-      String originCountry = row.getString("Country or territory of origin");
-      int numRefugees = row.getInt("Refugees");
-      originCountries.put(originCountry, numRefugees);
-      System.out.println(originCountry + ": " + numRefugees);
+        String originCountry = row.getString("Country or territory of origin");
+        float num = row.getInt("Refugees");
+        allVals.put(num, originCountry);
     }
-           
+    
+    for(int i = 0; i < 5; i++) {
+      if(!allVals.isEmpty()) {
+        float num = allVals.lastKey();
+        numRefugees[i] = num;
+        originCountries[i] = allVals.get(num); // get associated country
+        allVals.remove(num);
+      }
+    }
+    
+    // draw bar graph
+    // documentation for graphing library: https://www.gicentre.net/utils/chart
+    textFont(smallcalibri);
+    chart = new BarChart(this);
+    chart.setData(numRefugees);
+    chart.showValueAxis(true);
+    chart.setBarLabels(originCountries);
+    chart.showCategoryAxis(true);
+    chart.transposeAxes(true);
+    chart.setBarColour(color(#0FB7BF));
+    chart.draw(1290, 400, 600, 450);
   }
 }
 
