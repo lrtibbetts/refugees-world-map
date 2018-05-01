@@ -12,7 +12,6 @@ PShape worldMap;
 Table refugeesData;
 Table countries; // table containing country codes
 HashMap totals;
-int maxTotal;
 ControlP5 cp5; 
 PFont calibri;
 PFont smallcalibri;
@@ -24,15 +23,16 @@ void setup() {
   
   // fonts
   calibri = loadFont("Calibri-28.vlw");
-  smallcalibri = loadFont("Calibri-Bold-20.vlw");
+  smallcalibri = loadFont("Calibri-Bold-18.vlw");
   
   // text box input
   cp5 = new ControlP5(this);
-  cp5.addTextfield("Country")
-     .setPosition(1600,50)
-     .setSize(250,40)
+  cp5.addTextfield("Enter a country:")
+     .setPosition(1550,50)
+     .setSize(300,50)
      .setFont(calibri) 
      .setColor(255)
+     .setColorBackground(0)
      ;
   
   worldMap = loadShape("worldHigh.svg"); // svg map from: https://www.amcharts.com/svg-maps/?map=world
@@ -72,7 +72,7 @@ void setup() {
   
   // draw the full map first to account for any countries without data
   fill(#fee0d2);
-  shape(worldMap, 20, 20);
+  shape(worldMap, 20, 70);
   
   // https://stackoverflow.com/questions/1066589/iterate-through-a-hashmap
   Iterator<Map.Entry<String, Integer>> entries = totals.entrySet().iterator();
@@ -90,19 +90,58 @@ void setup() {
       c = #fb6a4a;
     } else if (total <= 125000) {
       c = #ef3b2c;
-    } else if (total <= 635000) {
+    } else if (total <= 625000) {
       c = #cb181d;
     } else
       c = #99000d;
     fill(c);
     countryShape.scale(1.25);
-    shape(countryShape, 20, 20);
+    shape(countryShape, 20, 70);
   }
+  
+  // create legend
+  fill(0);
+  textFont(smallcalibri);
+  text("Number of refugees in 2016:", 50, 650);
+  fill(#fee0d2);
+  rect(50, 670, 30, 30);
+  fill(0);
+  text("No refugees", 90, 690);
+  
+  fill(#fcbba1);
+  rect(50, 700, 30, 30);
+  fill(0);
+  text("< 1000", 90, 720);
+  
+  fill(#fc9272);
+  rect(50, 730, 30, 30);
+  fill(0);
+  text("< 5000", 90, 750);
+  
+  fill(#fb6a4a);
+  rect(50, 760, 30, 30);
+  fill(0);
+  text("< 25000", 90, 780);
+  
+  fill(#ef3b2c);
+  rect(50, 790, 30, 30);
+  fill(0);
+  text("< 250000", 90, 810);
+  
+  fill(#cb181d);
+  rect(50, 820, 30, 30);
+  fill(0);
+  text("< 625000", 90, 840);
+  
+  fill(#99000d);
+  rect(50, 850, 30, 30);
+  fill(0);
+  text("> 625000", 90, 870);
 }
 
 void controlEvent(ControlEvent event) {
   fill(#A7ABAD);
-  rect(1290, 400, 610, 500); // clear area to draw new graph
+  rect(1240, 400, 650, 500); // clear area to draw new graph
   
   if(event.isAssignableFrom(Textfield.class)) {
     String country = event.getStringValue();
@@ -134,8 +173,8 @@ void controlEvent(ControlEvent event) {
     chart.setBarLabels(originCountries);
     chart.showCategoryAxis(true);
     chart.transposeAxes(true);
-    chart.setBarColour(color(#0FB7BF));
-    chart.draw(1290, 400, 600, 450);
+    chart.setBarColour(color(0));
+    chart.draw(1240, 400, 650, 450);
   }
 }
 
