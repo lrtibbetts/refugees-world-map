@@ -1,7 +1,7 @@
 /* Data Visualization Final Project
    Lucy Tibbetts
-   resources utilized: https://forum.processing.org/one/topic/interactive-svg-map-with-processing-js.html
-                       http://www.sojamo.de/libraries/controlP5/examples/controllers/ControlP5textfield/ControlP5textfield.pde
+   5-1-2017
+   resource utilized: https://forum.processing.org/one/topic/interactive-svg-map-with-processing-js.html
 */
 
 import java.util.*;
@@ -15,15 +15,17 @@ HashMap totals;
 ControlP5 cp5; 
 PFont calibri;
 PFont smallcalibri;
+PFont bigcalibri;
 String text;
 BarChart chart;
 
 void setup() {
-  size(1900, 950);
+  size(1900, 925);
   
   // fonts
   calibri = loadFont("Calibri-28.vlw");
   smallcalibri = loadFont("Calibri-Bold-18.vlw");
+  bigcalibri = loadFont("Calibri-Bold-30.vlw");
   
   // text box input
   cp5 = new ControlP5(this);
@@ -73,6 +75,11 @@ void setup() {
   // draw the full map first to account for any countries without data
   fill(#fee0d2);
   shape(worldMap, 20, 70);
+  
+  // title
+  fill(0);
+  textFont(bigcalibri);
+  text("Refugee Movement in 2016", 775, 45);
   
   // https://stackoverflow.com/questions/1066589/iterate-through-a-hashmap
   Iterator<Map.Entry<String, Integer>> entries = totals.entrySet().iterator();
@@ -167,6 +174,8 @@ void controlEvent(ControlEvent event) {
     // draw bar graph
     // documentation for graphing library: https://www.gicentre.net/utils/chart
     textFont(smallcalibri);
+    fill(0);
+    text("Countries of Origin:", 1550, 390);
     chart = new BarChart(this);
     chart.setData(numRefugees);
     chart.showValueAxis(true);
